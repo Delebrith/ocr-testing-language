@@ -13,8 +13,22 @@ import java.util.Arrays;
 public class InterpreterInitializer {
 
 
+    public static void start(String []args) throws IOException {
+        if (args.length < 1){
+            System.out.println("No path to script was given");
+        } else if (args.length > 1){
+            if (args[0].equals("-tree")){
+                InterpreterInitializer.generateTreeView(args[1]);
+            } else {
+                System.out.println("Unknown flag: " + args[0]);
+            }
+        } else {
+            InterpreterInitializer.execute(args[0]);
+        }
+    }
 
-    public static void generateTreeView(String pathToScript) throws IOException {
+
+    private static void generateTreeView(String pathToScript) throws IOException {
         CharStream charStream = CharStreams.fromFileName(pathToScript);
         ScriptLexer languageLexer = new ScriptLexer(charStream);
         TokenSource tokenSource = new ListTokenSource(languageLexer.getAllTokens());
@@ -31,7 +45,7 @@ public class InterpreterInitializer {
         frame.setVisible(true);
     }
 
-    public static void execute(String pathToScript) throws IOException {
+    private static void execute(String pathToScript) throws IOException {
         CharStream charStream = CharStreams.fromFileName(pathToScript);
         ScriptLexer scriptLexer = new ScriptLexer(charStream);
         TokenSource tokenSource = new ListTokenSource(scriptLexer.getAllTokens());
