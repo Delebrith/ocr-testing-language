@@ -2,7 +2,7 @@ package edu.pw;
 
 import edu.pw.lexer.ScriptLexer;
 import edu.pw.parser.InterpretingVisitor;
-import edu.pw.parser.ScriptParser;
+import edu.pw.parser.generated.ScriptParser;
 import org.antlr.v4.gui.TreeViewer;
 import org.antlr.v4.runtime.*;
 
@@ -14,7 +14,7 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
 
-        CharStream charStream = CharStreams.fromFileName("example4.txt");
+        CharStream charStream = CharStreams.fromFileName("examples/example5.txt");
         ScriptLexer languageLexer = new ScriptLexer(charStream);
         TokenSource tokenSource = new ListTokenSource(languageLexer.getAllTokens());
         TokenStream tokenStream = new CommonTokenStream(tokenSource);
@@ -31,7 +31,7 @@ public class Main {
         frame.setSize(200,200);
         frame.setVisible(true);
 
-        CharStream charStream2 = CharStreams.fromFileName("example4.txt");
+        CharStream charStream2 = CharStreams.fromFileName("examples/example5.txt");
         ScriptLexer languageLexer2 = new ScriptLexer(charStream2);
         TokenSource tokenSource2 = new ListTokenSource(languageLexer2.getAllTokens());
         TokenStream tokenStream2 = new CommonTokenStream(tokenSource2);

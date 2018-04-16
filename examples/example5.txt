@@ -1,0 +1,13 @@
+Void main() {
+    Image i = loadImage("examples/ABCDEFGHIJKLMNOPQRST.jpg");
+    Text read = ocr(i);
+    print(read);
+    Text t = loadText("examples/ABCDEFGHIJKLMNOPQRST.txt");
+    print(t);
+    print(compare(ocr(i), t));
+}
+
+# expected result:
+# text of image from: examples/ABCDEFGHIJKLMNOPQRST.jpg
+# ABCDEFGHIJKLMNOPQRST
+# 70 (or another random number)

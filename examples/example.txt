@@ -19,7 +19,7 @@ Void main() {
     Text t2 = "aaa";
     Integer quality = 1;
     print(result(t2));
-    t2 = "LOOOOOL" + "XDDDD";
+    t2 = "ABC" + "DEF";
     i123 = addition(10, 11);
 
     # to jest komentarz, olej to

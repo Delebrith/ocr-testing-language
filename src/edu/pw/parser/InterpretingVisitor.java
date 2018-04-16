@@ -1,9 +1,15 @@
 package edu.pw.parser;
 
 import edu.pw.parser.exception.*;
+import edu.pw.parser.exception.definition.FunctionUndefinedException;
+import edu.pw.parser.exception.definition.MultipleVariableDeclarationException;
+import edu.pw.parser.exception.definition.VariableUndeclaredException;
+import edu.pw.parser.exception.type.InvalidArgumentTypeException;
+import edu.pw.parser.exception.type.InvalidAssignmentTypeException;
+import edu.pw.parser.exception.type.InvalidReturnTypeException;
+import edu.pw.parser.generated.ScriptBaseVisitor;
+import edu.pw.parser.generated.ScriptParser;
 
-import java.io.IOException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Stack;
 
@@ -98,12 +104,14 @@ public class InterpretingVisitor extends ScriptBaseVisitor<Variable> {
     @Override
     public Variable visitDeclarationStatement(ScriptParser.DeclarationStatementContext ctx) {
         if (scopeStack.peek().containsKey(ctx.ID().getText()))
-            throw new VariableAlreadyDeclaredException();
+            throw new MultipleVariableDeclarationException("Variable: " + ctx.ID().getText() +
+            " already declared.");
         Variable value = new Variable(Type.valueOf(ctx.TYPE().getText().toUpperCase()), "");
         if (ctx.value() != null) {
             Variable assigned = visitValue(ctx.value());
             if (!value.getType().equals(assigned.getType()))
-                throw new InvalidTypeException();
+                throw new InvalidAssignmentTypeException("Variable " + ctx.ID().getText() +
+                        "is type " + ctx.TYPE().getText() + ". Assigned value is type: " + assigned.getType());
             value.setValue(assigned.getValue());
         }
         scopeStack.peek().put(ctx.ID().getText(), value);
@@ -116,7 +124,8 @@ public class InterpretingVisitor extends ScriptBaseVisitor<Variable> {
             throw new VariableUndeclaredException("Variable of name: " + ctx.ID().getText() + " was used without previous declaration");
         Variable value = visit(ctx.value());
         if (!scopeStack.peek().get(ctx.ID().getText()).getType().equals(value.getType()))
-            throw new InvalidTypeException();
+            throw new InvalidAssignmentTypeException("Variable " + scopeStack.peek().get(ctx.ID().getText()) +
+            "is type " + scopeStack.peek().get(ctx.ID().getText()).getType() + ". Assigned value is type: " + value.getType());
         scopeStack.peek().get(ctx.ID().getText()).setValue(value.getValue());
         return null;
     }
@@ -129,12 +138,12 @@ public class InterpretingVisitor extends ScriptBaseVisitor<Variable> {
             return standardLibrary.executeStandard(functionId, ctx);
 
         if (!functionDefinitionContextHashMap.containsKey(ctx.ID().getText()))
-            throw new FunctionUndefinedException();
+            throw new FunctionUndefinedException("Function: " + ctx.ID().getText() + " was not defined.");
         ScriptParser.FunctionDefinitionContext definitionContext =
                 functionDefinitionContextHashMap.get(ctx.ID().getText());
         HashMap<String, Variable> newScope = new HashMap<>();
         visitParameters(definitionContext.parameters(), newScope);
-        visitArguments(ctx.arguments(), definitionContext.parameters(), newScope);
+        visitArguments(ctx.arguments(), definitionContext.parameters(), newScope, functionId);
         scopeStack.push(newScope);
         Variable result = visitFunctionDefinition(definitionContext);
         scopeStack.pop();
@@ -143,14 +152,17 @@ public class InterpretingVisitor extends ScriptBaseVisitor<Variable> {
     }
 
     public Variable visitArguments(ScriptParser.ArgumentsContext argumentsContext, ScriptParser.ParametersContext parametersContext,
-                                   HashMap<String, Variable> scope) {
+                                   HashMap<String, Variable> scope, String functionName) {
         if (argumentsContext.value().size() != parametersContext.ID().size())
-            throw new InvalidFunctionInvocationException();
+            throw new InvalidFunctionInvocationException("Wrong number of arguments. " +
+                    "Function" + functionName + " requires" + parametersContext.ID().size() + " arguments.");
         for (int i = 0; i < argumentsContext.value().size(); i++){
-            Variable argument = scope.get(parametersContext.ID(i).getText());
-            if (!argument.getType().equals(visitValue(argumentsContext.value(i)).getType()))
-                throw new InvalidTypeException();
-            argument.setValue(visitValue(argumentsContext.value(i)).getValue());
+            Variable parameter = scope.get(parametersContext.ID(i).getText());
+            if (!parameter.getType().equals(visitValue(argumentsContext.value(i)).getType()))
+                throw new InvalidArgumentTypeException("Given arguments are not the same type as function parameters. Parameter "
+                + scope.get(parametersContext.ID(i).getText()) + " should be type: "
+                        + scope.get(parametersContext.ID(i).getText()).getType() + "in function " + functionName);
+            parameter.setValue(visitValue(argumentsContext.value(i)).getValue());
         }
         return null;
     }
@@ -170,12 +182,14 @@ public class InterpretingVisitor extends ScriptBaseVisitor<Variable> {
                 switch (operator) {
                     case "+":
                         if (!part.getType().equals(Type.INTEGER))
-                            throw new InvalidTypeException();
+                            throw new InvalidArgumentTypeException("Cannot perform addition operation on types " +
+                                    result.getType() + " and " + part.getType() + ". Types should be " + Type.INTEGER);
                         result.setValue(String.valueOf(Integer.valueOf(result.getValue()) + Integer.valueOf(part.getValue())));
                         break;
                     case "-":
                         if (!part.getType().equals(Type.INTEGER))
-                            throw new InvalidTypeException();
+                            throw new InvalidArgumentTypeException("Cannot perform subtraction operation on type " + part.getType()
+                                    + ". Type should be " + Type.INTEGER);
                         result.setValue(String.valueOf(Integer.valueOf(result.getValue()) - Integer.valueOf(part.getValue())));
                         break;
                 }
@@ -185,10 +199,12 @@ public class InterpretingVisitor extends ScriptBaseVisitor<Variable> {
                         if (part.getType().equals(Type.INTEGER) || part.getType().equals(Type.TEXT))
                             result.setValue(new String(result.getValue() + part.getValue()));
                         else
-                            throw new InvalidTypeException();
+                            throw new InvalidArgumentTypeException("Cannot perform concatenation operation on type " + part.getType()
+                                    + ". Type should be " + Type.TEXT + " or " + Type.INTEGER);
                         break;
                     case "-":
-                        throw new InvalidOperatorException();
+                        throw new InvalidArgumentTypeException("Cannot perform subraction operation on type " + part.getType()
+                                + ". Type should be " + Type.INTEGER);
                 }
             }
         }
@@ -201,7 +217,8 @@ public class InterpretingVisitor extends ScriptBaseVisitor<Variable> {
         for (int i = 1; i < ctx.children.size(); i += 2) {
             Variable part = visit(ctx.getChild(i+1));
             if (!part.getType().equals(Type.INTEGER))
-                throw new InvalidTypeException();
+                throw new InvalidArgumentTypeException("Cannot perform multiplication operation on type " + part.getType()
+                        + ". Type should be " + Type.INTEGER);
             String operator = ctx.getChild(i) == null ? "" : ctx.getChild(i).getText();
             switch (operator){
                 case "*":
@@ -223,13 +240,15 @@ public class InterpretingVisitor extends ScriptBaseVisitor<Variable> {
         if (null != ctx.MINUS_OP()) {
             internalResult = super.visit(ctx.getChild(1));
             if (!internalResult.getType().equals(Type.INTEGER))
-                throw new InvalidTypeException();
+                throw new InvalidArgumentTypeException("Cannot perform negation operation on type " + internalResult.getType()
+                        + ". Type should be " + Type.INTEGER);
             internalResult.setValue(
                     String.valueOf(-1 * Integer.valueOf(internalResult.getValue())));
         } else {
             internalResult = super.visit(ctx.getChild(0));
             if (!internalResult.getType().equals(Type.INTEGER) && !internalResult.getType().equals(Type.TEXT))
-                throw new InvalidTypeException();
+                throw new InvalidArgumentTypeException("Cannot perform arithmetic operation on type " + internalResult.getType()
+                        + ". Type should be " + Type.INTEGER + " or " + Type.TEXT);
         }
         return internalResult;
     }
@@ -243,10 +262,11 @@ public class InterpretingVisitor extends ScriptBaseVisitor<Variable> {
     public Variable visitAlternative(ScriptParser.AlternativeContext ctx) {
         Boolean result = false;
         for (int i = 0; i < ctx.children.size(); i += 2) {
-            Variable part = visit(ctx.getChild(i));
-            if (!part.getType().equals(Type.BOOLEAN))
-                throw new InvalidTypeException();
-            result = result || (part.getValue().equals(BooleanValue.TRUE.getValue()) ? true : false);
+            Variable partialResult = visit(ctx.getChild(i));
+            if (!partialResult.getType().equals(Type.BOOLEAN))
+                throw new InvalidArgumentTypeException("Cannot perform logic operation on type " + partialResult.getType()
+                        + ". Type should be " + Type.BOOLEAN);
+            result = result || (partialResult.getValue().equals(BooleanValue.TRUE.getValue()) ? true : false);
         }
         return new Variable(Type.BOOLEAN, result ? BooleanValue.TRUE.getValue() : BooleanValue.FALSE.getValue());
     }
@@ -255,10 +275,11 @@ public class InterpretingVisitor extends ScriptBaseVisitor<Variable> {
     public Variable visitCojunction(ScriptParser.CojunctionContext ctx) {
         Boolean result = true;
         for (int i = 0; i < ctx.children.size(); i += 2) {
-            Variable part = visit(ctx.getChild(i));
-            if (!part.getType().equals(Type.BOOLEAN))
-                throw new InvalidTypeException();
-            result = result && (part.getValue().equals(BooleanValue.TRUE.getValue()) ? true : false);
+            Variable partialResult = visit(ctx.getChild(i));
+            if (!partialResult.getType().equals(Type.BOOLEAN))
+                throw new InvalidArgumentTypeException("Cannot perform logic operation on type " + partialResult.getType()
+                        + ". Type should be " + Type.BOOLEAN);
+            result = result && (partialResult.getValue().equals(BooleanValue.TRUE.getValue()) ? true : false);
         }
         return new Variable(Type.BOOLEAN, result ? BooleanValue.TRUE.getValue() : BooleanValue.FALSE.getValue());
     }
@@ -309,7 +330,8 @@ public class InterpretingVisitor extends ScriptBaseVisitor<Variable> {
         if (null != ctx.NEGATION_OP()) {
             internalResult = visit(ctx.getChild(1));
             if (!internalResult.getType().equals(Type.BOOLEAN))
-                throw new InvalidTypeException();
+                throw new InvalidArgumentTypeException("Cannot perform logic operation on type " + internalResult.getType()
+                        + ". Type should be " + Type.BOOLEAN);
             if (internalResult.getValue().equals(BooleanValue.TRUE.getValue())) {
                 internalResult.setValue(BooleanValue.FALSE.getValue());
             } else {
@@ -318,7 +340,8 @@ public class InterpretingVisitor extends ScriptBaseVisitor<Variable> {
         } else {
             internalResult = visit(ctx.getChild(0));
             if (!internalResult.getType().equals(Type.BOOLEAN))
-                throw new InvalidTypeException();
+                throw new InvalidArgumentTypeException("Cannot perform logic operation on type " + internalResult.getType()
+                + ". Type should be " + Type.BOOLEAN);
         }
         return internalResult;
     }
