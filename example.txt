@@ -1,0 +1,38 @@
+Integer result(Text t) {
+    if (countWords(t) == 3) {
+        return 3;
+    } else {
+        return 0;
+    }
+}
+
+Integer addition(Integer a, Integer b) {
+    return a + b;
+}
+
+Void main() {
+    Integer i123 = -1222200;
+    Boolean b = (1 < 10);
+    Integer i098 = 123 * 1 + 1 * 3;
+    Text t1 = "\"Ala ma kota\" - powiedziała sierotka Marysia.";
+    print(t1);
+    Text t2 = "aaa";
+    Integer quality = 1;
+    print(result(t2));
+    t2 = "LOOOOOL" + "XDDDD";
+    i123 = addition(10, 11);
+
+    # to jest komentarz, olej to
+
+    if ( 2 + 2 * 5 == 123 ) {
+     print("print");
+    } elseif (false) {
+        while (true) {
+            t2 = t2 + "a";
+            #komentarz
+            quality = (quality + 1) / 2;
+        }
+    } else {
+        print("xxx" + "123");
+    }
+}

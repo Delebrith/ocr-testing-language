@@ -1,0 +1,18 @@
+Integer addition(Integer a, Integer b) {
+    return a + b;
+}
+
+Void main() {
+
+    Text t = "Some text";
+    print(t + " xDDD");
+    if ( addition(1, 2) == 5) {
+        print("result is 5");
+    } elseif ( true ) {
+        print(t + " was printed");
+    } else {
+        Integer i;
+        i = addition(0, -123);
+    }
+    print(t);
+}
