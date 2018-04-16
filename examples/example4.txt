@@ -5,3 +5,10 @@ Void main() {
         print(i);
     }
 }
+
+# expected output
+# 2
+# 4
+# 6
+# 8
+# 10

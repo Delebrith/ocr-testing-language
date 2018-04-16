@@ -53,7 +53,7 @@ public class StandardLibrary {
                 content = Files.readAllBytes(Paths.get(variable.getValue()));
             } catch (IOException e) {
                 throw new FileException("Cannot read file: " + variable.getValue() +
-                        "or file does not exist.");
+                        " or file does not exist.");
             }
             return new Variable(Type.IMAGE, variable.getValue(), content);
         } else {
@@ -73,7 +73,7 @@ public class StandardLibrary {
                 content = Files.readAllBytes(Paths.get(variable.getValue()));
             } catch (IOException e) {
                 throw new FileException("Cannot read file: " + variable.getValue() +
-                "or file does not exist.");
+                " or file does not exist.");
             }
             return new Variable(Type.TEXT, new String(content, Charset.forName("UTF-8")), content);
         } else {

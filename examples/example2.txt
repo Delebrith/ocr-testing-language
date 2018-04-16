@@ -5,7 +5,7 @@ Integer addition(Integer a, Integer b) {
 Void main() {
 
     Text t = "Some text";
-    print(t + " xDDD");
+    print(t + " to print");
     if ( addition(1, 2) == 5) {
         print("result is 5");
     } elseif ( true ) {
@@ -14,5 +14,8 @@ Void main() {
         Integer i;
         i = addition(0, -123);
     }
-    print(t);
 }
+
+# expected output
+# Some text to print
+# Some text to print was printed
