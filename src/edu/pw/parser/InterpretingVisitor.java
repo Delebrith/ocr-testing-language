@@ -11,6 +11,7 @@ import edu.pw.parser.generated.ScriptBaseVisitor;
 import edu.pw.parser.generated.ScriptParser;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Stack;
 
 public class InterpretingVisitor extends ScriptBaseVisitor<Variable> {
@@ -40,11 +41,11 @@ public class InterpretingVisitor extends ScriptBaseVisitor<Variable> {
         if (result == null) result = Variable.getEmpty();
         if (!result.getType().equals(Type.valueOf(ctx.TYPE().getText().toUpperCase())))
             throw new InvalidReturnTypeException("Function: " + ctx.ID().getText() + " returns value of type: " +
-            String.valueOf(result.getType()) + ". Should return: " + ctx.TYPE().getText());
+            result.getType() + ". Should return: " + ctx.TYPE().getText());
         return result;
     }
 
-    public Variable visitParameters(ScriptParser.ParametersContext ctx, HashMap<String, Variable> scope) {
+    public Variable visitParameters(ScriptParser.ParametersContext ctx, Map<String, Variable> scope) {
         for(int i = 0; i < ctx.ID().size(); i++){
             scope.put(ctx.ID(i).getText(), new Variable(Type.valueOf(ctx.TYPE(i).getText().toUpperCase()), ""));
         }
@@ -55,8 +56,7 @@ public class InterpretingVisitor extends ScriptBaseVisitor<Variable> {
     public Variable visitInstructionSet(ScriptParser.InstructionSetContext ctx) {
         for (int i = 0; i < ctx.statement().size(); i++){
             if (ctx.statement(i).returnStatement() != null) {
-                Variable result = visitReturnStatement(ctx.statement(i).returnStatement());
-                return result;
+                return visitReturnStatement(ctx.statement(i).returnStatement());
             }
             Variable result = visitStatement(ctx.statement(i));
             if (result != null && result.getType() != Type.VOID) return result;
@@ -152,7 +152,7 @@ public class InterpretingVisitor extends ScriptBaseVisitor<Variable> {
     }
 
     public Variable visitArguments(ScriptParser.ArgumentsContext argumentsContext, ScriptParser.ParametersContext parametersContext,
-                                   HashMap<String, Variable> scope, String functionName) {
+                                   Map<String, Variable> scope, String functionName) {
         if (argumentsContext.value().size() != parametersContext.ID().size())
             throw new InvalidFunctionInvocationException("Wrong number of arguments. " +
                     "Function" + functionName + " requires" + parametersContext.ID().size() + " arguments.");
@@ -179,32 +179,30 @@ public class InterpretingVisitor extends ScriptBaseVisitor<Variable> {
             Variable part = visit(ctx.getChild(i+1));
             String operator = ctx.getChild(i) == null ? "" : ctx.getChild(i).getText();
             if (result.getType().equals(Type.INTEGER)) {
-                switch (operator) {
-                    case "+":
-                        if (!part.getType().equals(Type.INTEGER))
-                            throw new InvalidArgumentTypeException("Cannot perform addition operation on types " +
-                                    result.getType() + " and " + part.getType() + ". Types should be " + Type.INTEGER);
-                        result.setValue(String.valueOf(Integer.valueOf(result.getValue()) + Integer.valueOf(part.getValue())));
-                        break;
-                    case "-":
-                        if (!part.getType().equals(Type.INTEGER))
-                            throw new InvalidArgumentTypeException("Cannot perform subtraction operation on type " + part.getType()
-                                    + ". Type should be " + Type.INTEGER);
-                        result.setValue(String.valueOf(Integer.valueOf(result.getValue()) - Integer.valueOf(part.getValue())));
-                        break;
+                if ("+".equals(operator)) {
+                    if (!part.getType().equals(Type.INTEGER))
+                        throw new InvalidArgumentTypeException("Cannot perform addition operation on types " +
+                                result.getType() + " and " + part.getType() + ". Types should be " + Type.INTEGER);
+                    result.setValue(String.valueOf(Integer.valueOf(result.getValue()) + Integer.valueOf(part.getValue())));
+
+                } else if ("-".equals(operator)) {
+                    if (!part.getType().equals(Type.INTEGER))
+                        throw new InvalidArgumentTypeException("Cannot perform subtraction operation on type " + part.getType()
+                                + ". Type should be " + Type.INTEGER);
+                    result.setValue(String.valueOf(Integer.valueOf(result.getValue()) - Integer.valueOf(part.getValue())));
+
                 }
             } else if (result.getType().equals(Type.TEXT)){
-                switch (operator) {
-                    case "+":
-                        if (part.getType().equals(Type.INTEGER) || part.getType().equals(Type.TEXT))
-                            result.setValue(new String(result.getValue() + part.getValue()));
-                        else
-                            throw new InvalidArgumentTypeException("Cannot perform concatenation operation on type " + part.getType()
-                                    + ". Type should be " + Type.TEXT + " or " + Type.INTEGER);
-                        break;
-                    case "-":
-                        throw new InvalidArgumentTypeException("Cannot perform subraction operation on type " + part.getType()
-                                + ". Type should be " + Type.INTEGER);
+                if ("+".equals(operator)) {
+                    if (part.getType().equals(Type.INTEGER) || part.getType().equals(Type.TEXT))
+                        result.setValue(String.valueOf(result.getValue() + part.getValue()));
+                    else
+                        throw new InvalidArgumentTypeException("Cannot perform concatenation operation on type " + part.getType()
+                                + ". Type should be " + Type.TEXT + " or " + Type.INTEGER);
+
+                } else if ("-".equals(operator)) {
+                    throw new InvalidArgumentTypeException("Cannot perform subtraction operation on type " + part.getType()
+                            + ". Type should be " + Type.INTEGER);
                 }
             }
         }
@@ -220,15 +218,14 @@ public class InterpretingVisitor extends ScriptBaseVisitor<Variable> {
                 throw new InvalidArgumentTypeException("Cannot perform multiplication operation on type " + part.getType()
                         + ". Type should be " + Type.INTEGER);
             String operator = ctx.getChild(i) == null ? "" : ctx.getChild(i).getText();
-            switch (operator){
-                case "*":
-                    result.setValue(String
-                            .valueOf(Integer.valueOf(result.getValue()) * Integer.valueOf(part.getValue())));
-                    break;
-                case "/":
-                    result.setValue(String
-                            .valueOf(Integer.valueOf(result.getValue()) / Integer.valueOf(part.getValue())));
-                    break;
+            if ("*".equals(operator)) {
+                result.setValue(String
+                        .valueOf(Integer.valueOf(result.getValue()) * Integer.valueOf(part.getValue())));
+
+            } else if ("/".equals(operator)) {
+                result.setValue(String
+                        .valueOf(Integer.valueOf(result.getValue()) / Integer.valueOf(part.getValue())));
+
             }
         }
         return result;
@@ -285,11 +282,6 @@ public class InterpretingVisitor extends ScriptBaseVisitor<Variable> {
     }
 
     @Override
-    public Variable visitCojunctionOperand(ScriptParser.CojunctionOperandContext ctx) {
-        return super.visitCojunctionOperand(ctx);
-    }
-
-    @Override
     public Variable visitComparison(ScriptParser.ComparisonContext ctx) {
         Variable operand1 = visit(ctx.getChild(0));
         Variable operand2 = visit(ctx.getChild(2));
@@ -297,19 +289,19 @@ public class InterpretingVisitor extends ScriptBaseVisitor<Variable> {
         String operator  = ctx.COMPARISON_OP().getSymbol().getText();
         switch (operator){
             case "<":
-                return  comparisonResult == -1 ?
+                return  comparisonResult < 0 ?
                         new Variable(Type.BOOLEAN, BooleanValue.TRUE.getValue())
                         : new Variable(Type.BOOLEAN, BooleanValue.FALSE.getValue());
             case "<=":
-                return (comparisonResult == -1 || comparisonResult == 0) ?
+                return (comparisonResult <= 0) ?
                         new Variable(Type.BOOLEAN, BooleanValue.TRUE.getValue())
                         : new Variable(Type.BOOLEAN, BooleanValue.FALSE.getValue());
             case ">":
-                return (comparisonResult == 1) ?
+                return (comparisonResult > 0) ?
                         new Variable(Type.BOOLEAN, BooleanValue.TRUE.getValue())
                         : new Variable(Type.BOOLEAN, BooleanValue.FALSE.getValue());
             case ">=":
-                return (comparisonResult == 1 || comparisonResult == 0) ?
+                return (comparisonResult >= 0) ?
                         new Variable(Type.BOOLEAN, BooleanValue.TRUE.getValue())
                         : new Variable(Type.BOOLEAN, BooleanValue.FALSE.getValue());
             case "==":
@@ -317,7 +309,7 @@ public class InterpretingVisitor extends ScriptBaseVisitor<Variable> {
                         new Variable(Type.BOOLEAN, BooleanValue.TRUE.getValue())
                         : new Variable(Type.BOOLEAN, BooleanValue.FALSE.getValue());
             case "!=":
-                return (comparisonResult != -1 || comparisonResult == 0) ?
+                return (comparisonResult != 0) ?
                         new Variable(Type.BOOLEAN, BooleanValue.TRUE.getValue())
                         : new Variable(Type.BOOLEAN, BooleanValue.FALSE.getValue());
         }
@@ -344,16 +336,6 @@ public class InterpretingVisitor extends ScriptBaseVisitor<Variable> {
                 + ". Type should be " + Type.BOOLEAN);
         }
         return internalResult;
-    }
-
-    @Override
-    public Variable visitValue(ScriptParser.ValueContext ctx) {
-        return super.visitValue(ctx);
-    }
-
-    @Override
-    public Variable visitAtom(ScriptParser.AtomContext ctx) {
-        return super.visitAtom(ctx);
     }
 
     @Override
