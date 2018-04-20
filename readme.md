@@ -1,5 +1,5 @@
-#Warsaw University of Technology 
-##Faculty of Electronics and Information Technologies
+# Warsaw University of Technology 
+## Faculty of Electronics and Information Technologies
 
 ### Interpreted script language for testing OCR mechanism
 
