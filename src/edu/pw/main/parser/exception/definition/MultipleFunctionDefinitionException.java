@@ -1,6 +1,6 @@
-package edu.pw.parser.exception.definition;
+package edu.pw.main.parser.exception.definition;
 
-import edu.pw.parser.exception.InterpretingException;
+import edu.pw.main.parser.exception.InterpretingException;
 
 public class MultipleFunctionDefinitionException extends InterpretingException {
     public MultipleFunctionDefinitionException(String message) {

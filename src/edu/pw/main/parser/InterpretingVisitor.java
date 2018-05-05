@@ -1,14 +1,15 @@
-package edu.pw.parser;
+package edu.pw.main.parser;
 
-import edu.pw.parser.exception.*;
-import edu.pw.parser.exception.definition.FunctionUndefinedException;
-import edu.pw.parser.exception.definition.MultipleVariableDeclarationException;
-import edu.pw.parser.exception.definition.VariableUndeclaredException;
-import edu.pw.parser.exception.type.InvalidArgumentTypeException;
-import edu.pw.parser.exception.type.InvalidAssignmentTypeException;
-import edu.pw.parser.exception.type.InvalidReturnTypeException;
-import edu.pw.parser.generated.ScriptBaseVisitor;
-import edu.pw.parser.generated.ScriptParser;
+
+import edu.pw.main.parser.exception.InvalidFunctionInvocationException;
+import edu.pw.main.parser.exception.definition.FunctionUndefinedException;
+import edu.pw.main.parser.exception.definition.MultipleVariableDeclarationException;
+import edu.pw.main.parser.exception.definition.VariableUndeclaredException;
+import edu.pw.main.parser.exception.type.InvalidArgumentTypeException;
+import edu.pw.main.parser.exception.type.InvalidAssignmentTypeException;
+import edu.pw.main.parser.exception.type.InvalidReturnTypeException;
+import edu.pw.main.parser.generated.ScriptBaseVisitor;
+import edu.pw.main.parser.generated.ScriptParser;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -289,18 +290,34 @@ public class InterpretingVisitor extends ScriptBaseVisitor<Variable> {
         String operator  = ctx.COMPARISON_OP().getSymbol().getText();
         switch (operator){
             case "<":
+                if (operand1.getType() != Type.INTEGER || operand2.getType() != Type.INTEGER)
+                    throw new InvalidArgumentTypeException("Cannot compare given variables: "
+                            + operand1.getType() + " " + operand1.getValue() + ", "
+                            + operand2.getType() + " " + operand2.getValue());
                 return  comparisonResult < 0 ?
                         new Variable(Type.BOOLEAN, BooleanValue.TRUE.getValue())
                         : new Variable(Type.BOOLEAN, BooleanValue.FALSE.getValue());
             case "<=":
+                if (operand1.getType() != Type.INTEGER || operand2.getType() != Type.INTEGER)
+                    throw new InvalidArgumentTypeException("Cannot compare given variables: "
+                            + operand1.getType() + " " + operand1.getValue() + ", "
+                            + operand2.getType() + " " + operand2.getValue());
                 return (comparisonResult <= 0) ?
                         new Variable(Type.BOOLEAN, BooleanValue.TRUE.getValue())
                         : new Variable(Type.BOOLEAN, BooleanValue.FALSE.getValue());
             case ">":
+                if (operand1.getType() != Type.INTEGER || operand2.getType() != Type.INTEGER)
+                    throw new InvalidArgumentTypeException("Cannot compare given variables: "
+                            + operand1.getType() + " " + operand1.getValue() + ", "
+                            + operand2.getType() + " " + operand2.getValue());
                 return (comparisonResult > 0) ?
                         new Variable(Type.BOOLEAN, BooleanValue.TRUE.getValue())
                         : new Variable(Type.BOOLEAN, BooleanValue.FALSE.getValue());
             case ">=":
+                if (operand1.getType() != Type.INTEGER || operand2.getType() != Type.INTEGER)
+                    throw new InvalidArgumentTypeException("Cannot compare given variables: "
+                            + operand1.getType() + " " + operand1.getValue() + ", "
+                            + operand2.getType() + " " + operand2.getValue());
                 return (comparisonResult >= 0) ?
                         new Variable(Type.BOOLEAN, BooleanValue.TRUE.getValue())
                         : new Variable(Type.BOOLEAN, BooleanValue.FALSE.getValue());
@@ -361,5 +378,11 @@ public class InterpretingVisitor extends ScriptBaseVisitor<Variable> {
         return scopeStack.peek().get(ctx.ID().getText());
     }
 
+    public HashMap<String, ScriptParser.FunctionDefinitionContext> getFunctionDefinitionContextHashMap() {
+        return functionDefinitionContextHashMap;
+    }
 
+    public Stack<HashMap<String, Variable>> getScopeStack() {
+        return scopeStack;
+    }
 }

@@ -1,0 +1,36 @@
+Integer result(Text t) {
+    if (countWords(t) == 3) {
+        return 3;
+    } else {
+        return 0;
+    }
+}
+
+Integer addition(Integer a, Integer b) {
+    return a + b;
+}
+
+Void main() {
+    Boolean testCondition = addition(1,2) < 5;
+    if (1 == 1) {
+        Integer testIfStatement = 1;
+    }
+    Integer testReturnStatement = addition(1,1);
+    print(testCondition);
+    Text testDeclarationStatement = "test";
+    print(result(testDeclarationStatement));
+    Integer testSum = 1 + 1;
+    Integer testMultiplication = 2 * 2;
+    Boolean testAlternative = true || false;
+    Boolean testCojunction = true && false;
+    Boolean testComparison = "123" != "321";
+    Integer testWhileStatement = 0;
+    while (testWhileStatement < 10) {
+        testWhileStatement = testWhileStatement + 2;
+    }
+
+}
+
+# expected output:
+# true
+# 0

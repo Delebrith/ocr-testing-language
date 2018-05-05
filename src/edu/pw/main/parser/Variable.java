@@ -1,6 +1,7 @@
-package edu.pw.parser;
+package edu.pw.main.parser;
 
-import edu.pw.parser.exception.type.InvalidArgumentTypeException;
+
+import edu.pw.main.parser.exception.type.InvalidArgumentTypeException;
 
 public class Variable implements Comparable<Variable> {
     private Type type;
@@ -52,12 +53,13 @@ public class Variable implements Comparable<Variable> {
             throw new InvalidArgumentTypeException("Compared variables are not the same type");
         if (this.getValue().equals(v.getValue()))
             return 0;
-        if (this.getType().equals(Type.INTEGER)){
+        if (this.getType().equals(Type.INTEGER)) {
             return Integer.compare(Integer.valueOf(this.getValue()), Integer.valueOf(v.getValue()));
         } else {
-            throw new InvalidArgumentTypeException("Cannot compare given variables: "
-                    + this.getType() + " " + this.getValue() + ", "
-                    + v.getType() + " " + v.getValue());
+            return -1;
+//            throw new InvalidArgumentTypeException("Cannot compare given variables: "
+//                    + this.getType() + " " + this.getValue() + ", "
+//                    + v.getType() + " " + v.getValue());
         }
     }
 }

@@ -1,4 +1,4 @@
-package edu.pw.parser;
+package edu.pw.main.parser;
 
 public enum BooleanValue {
     TRUE("true"), FALSE("false");

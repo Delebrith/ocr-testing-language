@@ -1,4 +1,4 @@
-package edu.pw.parser;
+package edu.pw.main.parser;
 
 public enum Type {
     INTEGER("Integer"), TEXT("Text"), IMAGE("Image"), VOID("Void"), BOOLEAN("Boolean");

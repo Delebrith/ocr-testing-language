@@ -1,8 +1,8 @@
-package edu.pw;
+package edu.pw.main;
 
-import edu.pw.lexer.ScriptLexer;
-import edu.pw.parser.InterpretingVisitor;
-import edu.pw.parser.generated.ScriptParser;
+import edu.pw.main.lexer.ScriptLexer;
+import edu.pw.main.parser.InterpretingVisitor;
+import edu.pw.main.parser.generated.ScriptParser;
 import org.antlr.v4.gui.TreeViewer;
 import org.antlr.v4.runtime.*;
 

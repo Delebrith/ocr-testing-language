@@ -13,7 +13,7 @@ Integer addition(Integer a, Integer b) {
 Void main() {
     Boolean b = addition(1,2) < 5;
     print(b);
-    Text t = "test text";
+    Text t = "edu.pw.test text";
     print(result(t));
 }
 

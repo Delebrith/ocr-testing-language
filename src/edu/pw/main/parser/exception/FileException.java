@@ -1,4 +1,4 @@
-package edu.pw.parser.exception;
+package edu.pw.main.parser.exception;
 
 public class FileException extends InterpretingException {
     public FileException(String message) {

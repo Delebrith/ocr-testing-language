@@ -1,4 +1,4 @@
-package edu.pw.parser.generated;// Generated from Script.g4 by ANTLR 4.7.1
+package edu.pw.main.parser.generated;// Generated from Script.g4 by ANTLR 4.7.1
 import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
 
 /**

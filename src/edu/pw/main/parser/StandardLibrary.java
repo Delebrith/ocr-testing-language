@@ -1,9 +1,9 @@
-package edu.pw.parser;
+package edu.pw.main.parser;
 
-import edu.pw.parser.exception.type.InvalidArgumentTypeException;
-import edu.pw.parser.generated.ScriptParser;
-import edu.pw.parser.exception.FileException;
-import edu.pw.parser.exception.InvalidFunctionInvocationException;
+import edu.pw.main.parser.exception.type.InvalidArgumentTypeException;
+import edu.pw.main.parser.generated.ScriptParser;
+import edu.pw.main.parser.exception.FileException;
+import edu.pw.main.parser.exception.InvalidFunctionInvocationException;
 
 import java.io.IOException;
 import java.nio.charset.Charset;

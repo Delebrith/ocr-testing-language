@@ -1,4 +1,4 @@
-package edu.pw;
+package edu.pw.main;
 
 import java.io.IOException;
 
