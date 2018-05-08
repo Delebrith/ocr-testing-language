@@ -1,0 +1,7 @@
+Void main() {
+    print("abc");
+}
+
+Void main() {
+    print("cde");
+}

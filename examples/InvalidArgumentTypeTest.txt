@@ -1,0 +1,4 @@
+Void main() {
+    Image i = loadImage(1234);
+}
+

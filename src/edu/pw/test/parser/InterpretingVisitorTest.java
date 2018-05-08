@@ -5,6 +5,11 @@ import edu.pw.main.parser.InterpretingVisitor;
 import edu.pw.main.parser.Type;
 import edu.pw.main.parser.Variable;
 import edu.pw.main.parser.exception.FileException;
+import edu.pw.main.parser.exception.definition.FunctionUndefinedException;
+import edu.pw.main.parser.exception.definition.MultipleFunctionDefinitionException;
+import edu.pw.main.parser.exception.definition.MultipleVariableDeclarationException;
+import edu.pw.main.parser.exception.type.InvalidArgumentTypeException;
+import edu.pw.main.parser.exception.type.InvalidAssignmentTypeException;
 import edu.pw.main.parser.generated.ScriptParser;
 import org.antlr.v4.runtime.*;
 import org.junit.Before;
@@ -139,7 +144,7 @@ public class InterpretingVisitorTest {
     @Test(expected = FileException.class)
     public void loadFile() throws IOException {
         //given
-        CharStream charStream = CharStreams.fromFileName("examples/example3.txt");
+        CharStream charStream = CharStreams.fromFileName("examples/fileExceptionTest.txt");
         ScriptLexer scriptLexer = new ScriptLexer(charStream);
         TokenSource tokenSource = new ListTokenSource(scriptLexer.getAllTokens());
         TokenStream tokenStream = new CommonTokenStream(tokenSource);
@@ -150,4 +155,73 @@ public class InterpretingVisitorTest {
         visitor.visit(scriptParser.script());
     }
 
+    @Test(expected = FunctionUndefinedException.class)
+    public void functionUndefinedTest() throws IOException {
+        //given
+        CharStream charStream = CharStreams.fromFileName("examples/FunctionUndefinedTest.txt");
+        ScriptLexer scriptLexer = new ScriptLexer(charStream);
+        TokenSource tokenSource = new ListTokenSource(scriptLexer.getAllTokens());
+        TokenStream tokenStream = new CommonTokenStream(tokenSource);
+        scriptParser = new ScriptParser(tokenStream);
+
+        visitor = new InterpretingVisitor();
+        //when
+        visitor.visit(scriptParser.script());
+    }
+
+    @Test(expected = MultipleFunctionDefinitionException.class)
+    public void multipleFunctionDefinitionTest() throws IOException {
+        //given
+        CharStream charStream = CharStreams.fromFileName("examples/MultipleFunctionDefinitionTest.txt");
+        ScriptLexer scriptLexer = new ScriptLexer(charStream);
+        TokenSource tokenSource = new ListTokenSource(scriptLexer.getAllTokens());
+        TokenStream tokenStream = new CommonTokenStream(tokenSource);
+        scriptParser = new ScriptParser(tokenStream);
+
+        visitor = new InterpretingVisitor();
+        //when
+        visitor.visit(scriptParser.script());
+    }
+
+    @Test(expected = MultipleVariableDeclarationException.class)
+    public void multipleVariableDeclarationTest() throws IOException {
+        //given
+        CharStream charStream = CharStreams.fromFileName("examples/MultipleVariableDeclarationTest.txt");
+        ScriptLexer scriptLexer = new ScriptLexer(charStream);
+        TokenSource tokenSource = new ListTokenSource(scriptLexer.getAllTokens());
+        TokenStream tokenStream = new CommonTokenStream(tokenSource);
+        scriptParser = new ScriptParser(tokenStream);
+
+        visitor = new InterpretingVisitor();
+        //when
+        visitor.visit(scriptParser.script());
+    }
+
+    @Test(expected = InvalidArgumentTypeException.class)
+    public void invalidArgumentTypeTest() throws IOException {
+        //given
+        CharStream charStream = CharStreams.fromFileName("examples/InvalidArgumentTypeTest.txt");
+        ScriptLexer scriptLexer = new ScriptLexer(charStream);
+        TokenSource tokenSource = new ListTokenSource(scriptLexer.getAllTokens());
+        TokenStream tokenStream = new CommonTokenStream(tokenSource);
+        scriptParser = new ScriptParser(tokenStream);
+
+        visitor = new InterpretingVisitor();
+        //when
+        visitor.visit(scriptParser.script());
+    }
+
+    @Test(expected = InvalidAssignmentTypeException.class)
+    public void invalidAssignmentTypeTest() throws IOException {
+        //given
+        CharStream charStream = CharStreams.fromFileName("examples/InvalidAssignmentTypeTest.txt");
+        ScriptLexer scriptLexer = new ScriptLexer(charStream);
+        TokenSource tokenSource = new ListTokenSource(scriptLexer.getAllTokens());
+        TokenStream tokenStream = new CommonTokenStream(tokenSource);
+        scriptParser = new ScriptParser(tokenStream);
+
+        visitor = new InterpretingVisitor();
+        //when
+        visitor.visit(scriptParser.script());
+    }
 }

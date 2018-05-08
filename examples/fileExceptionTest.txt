@@ -1,0 +1,12 @@
+Void main() {
+    Boolean b = (1 < 10);
+    Text t1 = "\"What a beautiful day\" - said Susan.";
+    Image i1 = loadImage("\home\images\image.jpg");
+    Text t2;
+    t2 = ocr(i1);
+    Integer quality = compare(t1, t2);
+    # this is a comment
+}
+
+# "What a beautiful day" - said Susan.
+# edu.pw.parser.exception.FileException: Cannot read file: \home\images\image.jpg or file does not exist.

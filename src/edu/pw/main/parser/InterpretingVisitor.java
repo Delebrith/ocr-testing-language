@@ -3,6 +3,7 @@ package edu.pw.main.parser;
 
 import edu.pw.main.parser.exception.InvalidFunctionInvocationException;
 import edu.pw.main.parser.exception.definition.FunctionUndefinedException;
+import edu.pw.main.parser.exception.definition.MultipleFunctionDefinitionException;
 import edu.pw.main.parser.exception.definition.MultipleVariableDeclarationException;
 import edu.pw.main.parser.exception.definition.VariableUndeclaredException;
 import edu.pw.main.parser.exception.type.InvalidArgumentTypeException;
@@ -31,6 +32,8 @@ public class InterpretingVisitor extends ScriptBaseVisitor<Variable> {
     @Override
     public Variable visitScript(ScriptParser.ScriptContext ctx) {
         for (ScriptParser.FunctionDefinitionContext definition : ctx.functionDefinition()) {
+            if (functionDefinitionContextHashMap.containsKey(definition.ID().getText()))
+                throw new MultipleFunctionDefinitionException("Function " + definition.ID().getText() + " already defined!");
             functionDefinitionContextHashMap.put(definition.ID().getText(), definition);
         }
         return visit(functionDefinitionContextHashMap.get("main"));

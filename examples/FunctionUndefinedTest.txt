@@ -1,0 +1,4 @@
+Void main() {
+    Boolean b = functionUndefined();
+}
+

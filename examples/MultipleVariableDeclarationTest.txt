@@ -1,0 +1,5 @@
+Void main() {
+    Boolean b = (1 < 10);
+    Boolean b = true;
+}
+
