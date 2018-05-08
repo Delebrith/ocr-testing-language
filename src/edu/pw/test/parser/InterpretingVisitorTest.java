@@ -4,12 +4,14 @@ import edu.pw.main.lexer.ScriptLexer;
 import edu.pw.main.parser.InterpretingVisitor;
 import edu.pw.main.parser.Type;
 import edu.pw.main.parser.Variable;
-import edu.pw.main.parser.exception.FileException;
+import edu.pw.main.parser.exception.InvalidFunctionInvocationException;
 import edu.pw.main.parser.exception.definition.FunctionUndefinedException;
-import edu.pw.main.parser.exception.definition.MultipleFunctionDefinitionException;
 import edu.pw.main.parser.exception.definition.MultipleVariableDeclarationException;
+import edu.pw.main.parser.exception.definition.MultipleFunctionDefinitionException;
 import edu.pw.main.parser.exception.type.InvalidArgumentTypeException;
 import edu.pw.main.parser.exception.type.InvalidAssignmentTypeException;
+import edu.pw.main.parser.exception.type.InvalidReturnTypeException;
+import edu.pw.main.parser.exception.FileException;
 import edu.pw.main.parser.generated.ScriptParser;
 import org.antlr.v4.runtime.*;
 import org.junit.Before;
@@ -17,7 +19,7 @@ import org.junit.Test;
 
 import java.io.IOException;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 public class InterpretingVisitorTest {
 
@@ -216,6 +218,34 @@ public class InterpretingVisitorTest {
     public void invalidAssignmentTypeTest() throws IOException {
         //given
         CharStream charStream = CharStreams.fromFileName("examples/InvalidAssignmentTypeTest.txt");
+        ScriptLexer scriptLexer = new ScriptLexer(charStream);
+        TokenSource tokenSource = new ListTokenSource(scriptLexer.getAllTokens());
+        TokenStream tokenStream = new CommonTokenStream(tokenSource);
+        scriptParser = new ScriptParser(tokenStream);
+
+        visitor = new InterpretingVisitor();
+        //when
+        visitor.visit(scriptParser.script());
+    }
+
+    @Test(expected = InvalidReturnTypeException.class)
+    public void invalidReturnTypeTest() throws IOException {
+        //given
+        CharStream charStream = CharStreams.fromFileName("examples/InvalidReturnTypeTest.txt");
+        ScriptLexer scriptLexer = new ScriptLexer(charStream);
+        TokenSource tokenSource = new ListTokenSource(scriptLexer.getAllTokens());
+        TokenStream tokenStream = new CommonTokenStream(tokenSource);
+        scriptParser = new ScriptParser(tokenStream);
+
+        visitor = new InterpretingVisitor();
+        //when
+        visitor.visit(scriptParser.script());
+    }
+
+    @Test(expected = InvalidFunctionInvocationException.class)
+    public void invalidFunctionInvocationTest() throws IOException {
+        //given
+        CharStream charStream = CharStreams.fromFileName("examples/InvalidFunctionInvocationTest.txt");
         ScriptLexer scriptLexer = new ScriptLexer(charStream);
         TokenSource tokenSource = new ListTokenSource(scriptLexer.getAllTokens());
         TokenStream tokenStream = new CommonTokenStream(tokenSource);

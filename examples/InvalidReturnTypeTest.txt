@@ -1,0 +1,7 @@
+Integer sum(Integer a, Integer b){
+    return "abc";
+}
+
+Void main() {
+    sum(1,1);
+}
