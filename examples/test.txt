@@ -20,7 +20,8 @@ Void main() {
     Text testDeclarationStatement = "test";
     print(result(testDeclarationStatement));
     Integer testSum = 1 + 1;
-    Integer testMultiplication = 2 * 2;
+    Integer testMultiplication1 = 2 + 2 * 2;
+    Integer testMultiplication2 = 2 * 2 + 2;
     Boolean testAlternative = true || false;
     Boolean testCojunction = true && false;
     Boolean testComparison = "123" != "321";

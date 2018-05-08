@@ -173,7 +173,7 @@ public class InterpretingVisitor extends ScriptBaseVisitor<Variable> {
 
     @Override
     public Variable visitNumericOperation(ScriptParser.NumericOperationContext ctx) {
-        return super.visitSum(ctx.sum());
+        return this.visitSum(ctx.sum());
     }
 
     @Override
@@ -239,14 +239,14 @@ public class InterpretingVisitor extends ScriptBaseVisitor<Variable> {
     public Variable visitSingleOperation(ScriptParser.SingleOperationContext ctx) {
         Variable internalResult;
         if (null != ctx.MINUS_OP()) {
-            internalResult = super.visit(ctx.getChild(1));
+            internalResult = this.visit(ctx.getChild(1));
             if (!internalResult.getType().equals(Type.INTEGER))
                 throw new InvalidArgumentTypeException("Cannot perform negation operation on type " + internalResult.getType()
                         + ". Type should be " + Type.INTEGER);
             internalResult.setValue(
                     String.valueOf(-1 * Integer.valueOf(internalResult.getValue())));
         } else {
-            internalResult = super.visit(ctx.getChild(0));
+            internalResult = this.visit(ctx.getChild(0));
             if (!internalResult.getType().equals(Type.INTEGER) && !internalResult.getType().equals(Type.TEXT))
                 throw new InvalidArgumentTypeException("Cannot perform arithmetic operation on type " + internalResult.getType()
                         + ". Type should be " + Type.INTEGER + " or " + Type.TEXT);

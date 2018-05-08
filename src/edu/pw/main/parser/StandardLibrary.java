@@ -122,7 +122,7 @@ public class StandardLibrary {
         Variable variable = visitor.visit(context.value(0));
         if (variable.getType().equals(Type.IMAGE)){
             Random random = new Random();
-            return new Variable(Type.TEXT, "text of image from: " + variable.getValue());
+            return new Variable(Type.TEXT,  variable.getValue());
         } else {
             throw new InvalidArgumentTypeException("Cannot perform ocr on type " + variable.getType() +
             ". Argument type should be " + Type.IMAGE);

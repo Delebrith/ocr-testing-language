@@ -102,7 +102,8 @@ public class InterpretingVisitorTest {
         //when
         Variable result = visitor.visit(scriptParser.script());
         //then
-        assertTrue(visitor.getScopeStack().peek().get("testMultiplication").getValue().equals("4"));
+        assertTrue(visitor.getScopeStack().peek().get("testMultiplication1").getValue().equals("6"));
+        assertTrue(visitor.getScopeStack().peek().get("testMultiplication2").getValue().equals("6"));
     }
 
     @Test
